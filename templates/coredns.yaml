@@ -78,7 +78,7 @@ metadata:
 spec:
   storageClassName: {{ required "A valid .Values.dns.RWX.storageClassName entry required! Specify an available RWX storage class." .Values.dns.RWX.storageClassName}}
   accessModes:
-    - ReadWriteMany
+    - ReadWriteOnce
   resources:
     requests:
       storage: {{ .Values.dns.storageSize }}

@@ -30,7 +30,7 @@ spec:
       containers:
       - env:
         - name: NETMAKER_SERVER_HOST
-          value: https://api.{{ required "A valid .Values.baseDomain entry required!" .Values.baseDomain}}
+          value: https://api.{{ required "A valid .Values.baseDomain entry required!" .Values.baseDomain}}:8443
         image: eclipse-mosquitto:2.0.11-openssl
         command: ["/mosquitto/config/wait.sh"]
         imagePullPolicy: Always
@@ -85,7 +85,7 @@ spec:
         name: wait-script
       - name: shared-data
         persistentVolumeClaim:
-        {{- if not .Values.mq.existingClaim }}
+        {{- if .Values.mq.existingClaim }}
           claimName: {{ .Values.mq.existingClaim }}
         {{- else }} 
           claimName: {{ include "netmaker.fullname" . }}-shared-data-pvc
@@ -95,7 +95,13 @@ apiVersion: v1
 kind: Service
 metadata:
   name: {{ include "netmaker.fullname" . }}-mqtt
+{{- if .Values.service.mq.annotations }}
+  annotations:
+{{ toYaml .Values.service.mq.annotations | indent 4 }}
+{{- end }}
 spec:
+  externalTrafficPolicy: Local
+  type: {{ .Values.service.type | default "ClusterIP" | quote }}
   ports:
   - name: mqtt
     port: 1883
@@ -117,7 +123,7 @@ metadata:
 spec:
   storageClassName: {{ required "A valid .Values.mq.RWX.storageClassName entry required! Specify an available RWX storage class." .Values.mq.RWX.storageClassName}}
   accessModes:
-    - ReadWriteMany
+    - ReadWriteOnce
   resources:
     requests:
       storage: {{ .Values.mq.storageSize }}

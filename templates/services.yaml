@@ -4,7 +4,12 @@ metadata:
   labels:
     {{- include "netmaker.labels" . | nindent 4 }}
   name: '{{ include "netmaker.fullname" . }}-ui'
+{{- if .Values.service.ui.annotations }}
+  annotations:
+{{ toYaml .Values.service.ui.annotations | indent 4 }}
+{{- end }}
 spec:
+  externalTrafficPolicy: Local
   ports:
   - port: {{ .Values.service.uiPort }}
     protocol: TCP
@@ -20,7 +25,12 @@ metadata:
   labels:
     {{- include "netmaker.labels" . | nindent 4 }}
   name: '{{ include "netmaker.fullname" . }}-rest'
+{{- if .Values.service.api.annotations }}
+  annotations:
+{{ toYaml .Values.service.api.annotations | indent 4 }}
+{{- end }}
 spec:
+  externalTrafficPolicy: Local
   ports:
   - name: rest
     port: {{ .Values.service.restPort }}
