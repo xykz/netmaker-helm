@@ -131,6 +131,9 @@ spec:
 {{- end }}
 apiVersion: v1
 data:
+  {{- if .Values.mq.config }}
+  mosquitto.conf: {{- .Values.mq.config | toYaml | indent 2 }}
+  {{- else }}
   mosquitto.conf: |
     per_listener_settings false
     listener 8883
@@ -141,6 +144,7 @@ data:
     allow_anonymous false
     plugin /usr/lib/mosquitto_dynamic_security.so
     plugin_opt_config_file /mosquitto/data/dynamic-security.json
+  {{- end }}
 kind: ConfigMap
 metadata:
   labels:
